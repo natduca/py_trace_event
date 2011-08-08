@@ -5,8 +5,7 @@ import json
 import tempfile
 import time
 import unittest
-from .decorators import *
-from .log import *
+from . import *
 from .trace_test import *
 
 class SingleThreadTest(TraceTest):

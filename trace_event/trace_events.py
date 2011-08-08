@@ -22,7 +22,12 @@ class TraceEvents(object):
       f = open(trace_filename, 'r')
       t = f.read()
       f.close()
-      events = json.loads(t)["events"]
+      try:
+        events = json.loads(t)["events"]
+      except ValueError:
+        print "trace was '%s'" % t
+        raise Exception("Corrupt trace, did not parse")
+      
 
     if not hasattr(events, '__iter__'):
       raise Exception, 'events must be iteraable.'
@@ -69,5 +74,5 @@ class TraceEvents(object):
   def findByPhase(self, ph):
     return TraceEvents([e for e in self.events if e["ph"] == ph])
 
-  def findByName(n):
+  def findByName(self, n):
     return TraceEvents([e for e in self.events if e["name"] == n])
