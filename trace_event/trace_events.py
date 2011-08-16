@@ -15,7 +15,7 @@ class TraceEvents(object):
     """
     if trace_filename and events:
       raise Exception("Provide either a trace file or event list")
-    if not trace_filename and not events:
+    if not trace_filename and events == None:
       raise Exception("Provide either a trace file or event list")
 
     if trace_filename:
@@ -27,7 +27,7 @@ class TraceEvents(object):
       except ValueError:
         print "trace was '%s'" % t
         raise Exception("Corrupt trace, did not parse")
-      
+
 
     if not hasattr(events, '__iter__'):
       raise Exception, 'events must be iteraable.'

@@ -8,7 +8,7 @@ import os
 import sys
 import threading
 
-__all__ = ["trace_enable", "trace_disable", "trace_flush"]
+__all__ = ["trace_enable", "trace_is_enabled", "trace_disable", "trace_flush"]
 
 
 _lock = threading.Lock()
@@ -23,6 +23,8 @@ _cur_events = [] # events that have yet to be buffered
 _tls = threading.local() # tls used to detect forking/etc
 _atexit_regsitered_for_pid = None
 
+_control_allowed = True
+
 def _locked(fn):
   def locked_fn(*args,**kwargs):
     _lock.acquire()
@@ -32,6 +34,10 @@ def _locked(fn):
       _lock.release()
     return ret
   return locked_fn
+
+def _disallow_tracing_control():
+  global _control_allowed
+  _control_allowed = False
 
 @_locked
 def trace_enable(log_file=None):
@@ -45,6 +51,8 @@ def trace_enable(log_file=None):
   global _enabled
   if _enabled:
     raise Exception("Already enabled")
+  if not _control_allowed:
+    raise Exception("Tracing control not allowed in child processes.")
   _enabled = True
   global _log_file
   global _log_file_owner
@@ -79,6 +87,8 @@ def trace_disable():
   on any existing child proceses.
   """
   global _enabled
+  if not _control_allowed:
+    raise Exception("Tracing control not allowed in child processes.")
   if not _enabled:
     return
   _enabled = False
@@ -101,6 +111,13 @@ def _flush(close=False):
   if close:
     _log_file.close()
     _log_file = None
+
+@_locked
+def trace_is_enabled():
+  """
+  Returns whether tracing is enabled.
+  """
+  return _enabled
 
 @_locked
 def add_trace_event(ph, ts, category, name, args=[]):
