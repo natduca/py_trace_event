@@ -89,7 +89,8 @@ def trace_flush():
   Flushes any currently-recorded trace data to disk. trace_event records traces
   into an in-memory buffer first, flushing only when told to do so.
   """
-  _flush()
+  if _enabled:
+    _flush()
 
 @_locked
 def trace_disable():
