@@ -10,7 +10,6 @@ import threading
 
 __all__ = ["trace_enable", "trace_is_enabled", "trace_disable", "trace_flush"]
 
-
 _lock = threading.Lock()
 
 _enabled = False
@@ -44,9 +43,9 @@ def trace_enable(log_file=None):
   """
   Enables tracing.
 
-  New multiprocessing.Process will inherit the enabled state.
-
-  log_file: if not provided, uses sys.argv[0] or trace_event.json
+  log_file: None, a string specifying what filename to log to, or any object
+  with a fileno() method. If None, begins recording to "%.json" %
+  sys.argv[0]. Can also be a string, or a file-like object.
   """
   global _enabled
   if _enabled:
@@ -61,8 +60,13 @@ def trace_enable(log_file=None):
     if sys.argv[0] == '':
       n = 'trace_event'
     else:
-      n = 'trace_event'
-    log_file = open("%s.json" % sys.argv[0], "wb")
+      n = sys.argv[0]
+    log_file = open("%s.json" % n, "wb")
+  elif isinstance(log_file, basestring):
+    log_file = open("%s" % log_file, "wb")
+  elif not hasattr(log_file, 'fileno'):
+    raise Exception("Log file must be None, a string, or a file-like object with a fileno()")
+
   _log_file = log_file
   fcntl.lockf(_log_file.fileno(), fcntl.LOCK_EX)
   _log_file.seek(0, os.SEEK_END)
@@ -76,7 +80,8 @@ def trace_enable(log_file=None):
 @_locked
 def trace_flush():
   """
-  Flushes any currently-recorded trace data to disk.
+  Flushes any currently-recorded trace data to disk. trace_event records traces
+  into an in-memory buffer first, flushing only when told to do so.
   """
   _flush()
 
