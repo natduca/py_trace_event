@@ -110,7 +110,7 @@ def _flush(close=False):
   global _log_file
   fcntl.lockf(_log_file.fileno(), fcntl.LOCK_EX)
   _log_file.seek(0, os.SEEK_END)
-  if _log_file.tell() != _log_file_first_event_pos:
+  if len(_cur_events) and _log_file.tell() != _log_file_first_event_pos:
     _log_file.write(",")
   _log_file.write(",".join([json.dumps(e) for e in _cur_events]))
   del _cur_events[:]
@@ -156,5 +156,4 @@ def add_trace_event(ph, ts, category, name, args=[]):
 
 
 def _trace_disable_atexit():
-  print "disabling tracing if needed."
   trace_disable()

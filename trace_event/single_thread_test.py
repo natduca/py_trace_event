@@ -29,6 +29,19 @@ class SingleThreadTest(TraceTest):
     actual_diff = actual_diff[0]
     self.assertAlmostEqual(actual_diff, measured_diff, 3)
 
+  def test_redundant_flush(self):
+    @trace
+    def func1():
+      time.sleep(0.25)
+      trace_flush()
+      trace_flush()
+
+    res = self.go(func1)
+    events = res.findEventsOnThread(res.findThreadIds()[0])
+    self.assertEquals(2, len(events))
+    self.assertEquals('B', events[0]["ph"])
+    self.assertEquals('E', events[1]["ph"])
+
   def test_nested_func(self):
     @trace
     def func1():

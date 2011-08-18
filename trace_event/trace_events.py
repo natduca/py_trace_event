@@ -69,7 +69,7 @@ class TraceEvents(object):
     return TraceEvents([e for e in self.events if e["pid"] == pid])
 
   def findEventsOnThread(self, tid):
-    return TraceEvents([e for e in self.events if e["tid"] == tid])
+    return TraceEvents([e for e in self.events if e["ph"] != "M" and e["tid"] == tid])
 
   def findByPhase(self, ph):
     return TraceEvents([e for e in self.events if e["ph"] == ph])
