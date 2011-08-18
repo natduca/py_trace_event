@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 import json
+import math
 import tempfile
 import time
 import unittest
@@ -26,8 +27,8 @@ class SingleThreadTest(TraceTest):
     self.assertEquals('B', events[0]["ph"])
     self.assertEquals('E', events[1]["ph"])
     measured_diff = events[1]["ts"] - events[0]["ts"]
-    actual_diff = actual_diff[0]
-    self.assertAlmostEqual(actual_diff, measured_diff, 3)
+    actual_diff = 1000000 * actual_diff[0]
+    self.assertTrue(math.fabs(actual_diff - measured_diff) < 1000)
 
   def test_redundant_flush(self):
     @trace

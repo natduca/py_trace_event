@@ -78,7 +78,7 @@ def _trace_enable(log_file=None):
   _log_file.seek(0, os.SEEK_END)
   _log_file_owner = _log_file.tell() == 0
   if _log_file_owner:
-    _log_file.write('{"events": [')
+    _log_file.write('{"traceEvents": [')
   _log_file.flush()
   _log_file_first_event_pos = _log_file.tell()
   fcntl.lockf(_log_file.fileno(), fcntl.LOCK_UN)
@@ -149,6 +149,8 @@ def add_trace_event(ph, ts, category, name, args=[]):
       tid = os.getpid()
     _tls.tid = tid
 
+  if ts:
+    ts = 1000000 * ts
   _cur_events.append({"ph": ph, "category": category,
                       "pid": _tls.pid, "tid": _tls.tid,
                       "ts": ts,

@@ -23,7 +23,7 @@ class TraceEvents(object):
       t = f.read()
       f.close()
       try:
-        events = json.loads(t)["events"]
+        events = json.loads(t)["traceEvents"]
       except ValueError:
         print "trace was '%s'" % t
         raise Exception("Corrupt trace, did not parse")
