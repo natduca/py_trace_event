@@ -38,7 +38,6 @@ def _disallow_tracing_control():
   global _control_allowed
   _control_allowed = False
 
-@_locked
 def trace_enable(log_file=None):
   """
   Enables tracing.
@@ -47,6 +46,13 @@ def trace_enable(log_file=None):
   with a fileno() method. If None, begins recording to "%.json" %
   sys.argv[0]. Can also be a string, or a file-like object.
   """
+  _trace_enable(log_file)
+  add_trace_event("M",None,
+                  "process_argv",
+                  {"argv": sys.argv})
+  
+@_locked
+def _trace_enable(log_file=None):
   global _enabled
   if _enabled:
     raise Exception("Already enabled")
@@ -83,8 +89,7 @@ def trace_flush():
   Flushes any currently-recorded trace data to disk. trace_event records traces
   into an in-memory buffer first, flushing only when told to do so.
   """
-  if _enabled:
-    _flush()
+  _flush()
 
 @_locked
 def trace_disable():
@@ -150,4 +155,5 @@ def add_trace_event(ph, ts, category, name, args=[]):
 
 
 def _trace_disable_atexit():
+  print "disabling tracing if needed."
   trace_disable()
