@@ -66,3 +66,4 @@ class SingleThreadTest(TraceTest):
        "E func2",
        "E func1"],
       efmt);
+
