@@ -61,14 +61,6 @@ def discover(dir, filters):
 
   return unittest.TestSuite(subsuites)
 
-if __name__ == '__main__':
-  if platform.system() == 'Darwin':
-    if os.getenv('VERSIONER_PYTHON_PREFER_32_BIT') != 'yes':
-      os.putenv('VERSIONER_PYTHON_PREFER_32_BIT', 'yes')
-      args = [sys.executable]
-      args.extend(sys.argv)
-      os.execv(args[0], args)
-
 def main():
   parser = optparse.OptionParser()
   parser.add_option(
