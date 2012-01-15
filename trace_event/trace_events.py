@@ -22,12 +22,28 @@ class TraceEvents(object):
       f = open(trace_filename, 'r')
       t = f.read()
       f.close()
-      try:
-        events = json.loads(t)["traceEvents"]
-      except ValueError:
-        print "trace was '%s'" % t
-        raise Exception("Corrupt trace, did not parse")
 
+      # If the event data begins with a [, then we know it should end with a ].
+      # The reason we check for this is because some tracing implementations
+      # cannot guarantee that a ']' gets written to the trace file. So, we are
+      # forgiving and if this is obviously the case, we fix it up before
+      # throwing the string at JSON.parse.
+      if t[0] == '[':
+        n = len(t);
+        if t[n - 1] != ']' and t[n - 1] != '\n':
+          t = t + ']'
+        elif t[n - 2] != ']' and t[n - 1] == '\n':
+          t = t + ']'
+        elif t[n - 3] != ']' and t[n - 2] == '\r' and t[n - 1] == '\n':
+          t = t + ']'
+
+      try:
+        events = json.loads(t)
+      except ValueError:
+        raise Exception("Corrupt trace, did not parse. Value: %s" % t)
+
+      if 'traceEvents' in events:
+        events = events['traceEvents']
 
     if not hasattr(events, '__iter__'):
       raise Exception, 'events must be iteraable.'
