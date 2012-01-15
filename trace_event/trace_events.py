@@ -52,7 +52,8 @@ class TraceEvents(object):
       return self.pids
     pids = set()
     for e in self.events:
-      pids.add(e["pid"])
+      if "pid" in e and e["pid"]:
+        pids.add(e["pid"])
     self.pids = list(pids)
     return self.pids
 
@@ -61,7 +62,8 @@ class TraceEvents(object):
       return self.tids
     tids = set()
     for e in self.events:
-      tids.add(e["tid"])
+      if "tid" in e and e["tid"]:
+        tids.add(e["tid"])
     self.tids = list(tids)
     return self.tids
 
