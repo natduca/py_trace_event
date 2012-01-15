@@ -67,9 +67,9 @@ def _trace_enable(log_file=None):
       n = 'trace_event'
     else:
       n = sys.argv[0]
-    log_file = open("%s.json" % n, "wb")
+    log_file = open("%s.json" % n, "ab")
   elif isinstance(log_file, basestring):
-    log_file = open("%s" % log_file, "wb")
+    log_file = open("%s" % log_file, "ab")
   elif not hasattr(log_file, 'fileno'):
     raise Exception("Log file must be None, a string, or a file-like object with a fileno()")
 
