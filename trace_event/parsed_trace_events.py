@@ -4,7 +4,7 @@
 import math
 import json
 
-class TraceEvents(object):
+class ParsedTraceEvents(object):
   def __init__(self, events = None, trace_filename = None):
     """
     Utility class for filtering and manipulating trace data.
@@ -84,13 +84,13 @@ class TraceEvents(object):
     return self.tids
 
   def findEventsOnProcess(self, pid):
-    return TraceEvents([e for e in self.events if e["pid"] == pid])
+    return ParsedTraceEvents([e for e in self.events if e["pid"] == pid])
 
   def findEventsOnThread(self, tid):
-    return TraceEvents([e for e in self.events if e["ph"] != "M" and e["tid"] == tid])
+    return ParsedTraceEvents([e for e in self.events if e["ph"] != "M" and e["tid"] == tid])
 
   def findByPhase(self, ph):
-    return TraceEvents([e for e in self.events if e["ph"] == ph])
+    return ParsedTraceEvents([e for e in self.events if e["ph"] == ph])
 
   def findByName(self, n):
-    return TraceEvents([e for e in self.events if e["name"] == n])
+    return ParsedTraceEvents([e for e in self.events if e["name"] == n])

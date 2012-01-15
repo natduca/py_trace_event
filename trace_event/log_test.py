@@ -8,14 +8,14 @@ import unittest
 
 
 from .log import *
-from .trace_events import *
+from .parsed_trace_events import *
 
 class TraceTest(unittest.TestCase):
   def test_enable_with_file(self):
     file = tempfile.NamedTemporaryFile()
     trace_enable(open(file.name, 'w+'))
     trace_disable()
-    e = TraceEvents(trace_filename = file.name)
+    e = ParsedTraceEvents(trace_filename = file.name)
     file.close()
     self.assertTrue(len(e) > 0)
 
@@ -23,7 +23,7 @@ class TraceTest(unittest.TestCase):
     file = tempfile.NamedTemporaryFile()
     trace_enable(file.name)
     trace_disable()
-    e = TraceEvents(trace_filename = file.name)
+    e = ParsedTraceEvents(trace_filename = file.name)
     file.close()
     self.assertTrue(len(e) > 0)
 
@@ -33,7 +33,7 @@ class TraceTest(unittest.TestCase):
       file = tempfile.NamedTemporaryFile()
       trace_enable()
       trace_disable()
-      e = TraceEvents(trace_filename = expected_filename)
+      e = ParsedTraceEvents(trace_filename = expected_filename)
       file.close()
       self.assertTrue(len(e) > 0)
     try:

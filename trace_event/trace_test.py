@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from .log import *
-from .trace_events import *
+from .parsed_trace_events import *
 
 
 class TraceTest(unittest.TestCase):
@@ -30,7 +30,7 @@ class TraceTest(unittest.TestCase):
       cb()
     finally:
       trace_disable()
-    e = TraceEvents(trace_filename = self._file.name)
+    e = ParsedTraceEvents(trace_filename = self._file.name)
     self._file.close()
     self._file = None
     return e
