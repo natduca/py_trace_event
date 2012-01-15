@@ -6,9 +6,10 @@ import fcntl
 import json
 import os
 import sys
+import time
 import threading
 
-__all__ = ["trace_enable", "trace_is_enabled", "trace_disable", "trace_flush"]
+__all__ = ["trace_enable", "trace_is_enabled", "trace_disable", "trace_flush", "trace_begin", "trace_end"]
 
 _lock = threading.Lock()
 
@@ -156,6 +157,11 @@ def add_trace_event(ph, ts, category, name, args=[]):
                       "ts": ts,
                       "name": name, "args": args});
 
+def trace_begin(name):
+  add_trace_event("B", time.time(), "python", name)
+
+def trace_end(name):
+  add_trace_event("E", time.time(), "python", name)
 
 def _trace_disable_atexit():
   trace_disable()
