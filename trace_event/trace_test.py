@@ -16,19 +16,31 @@ class TraceTest(unittest.TestCase):
     Does not actually run any tests. Look at subclasses for those.
     """
     unittest.TestCase.__init__(self, *args)
+    self._file = None
 
   def go(self, cb):
     """
     Enables tracing, runs the provided callback, and if successful, returns a
     TraceEvents object with the results.
     """
-    file = tempfile.NamedTemporaryFile()
-    trace_enable(open(file.name, 'w+'))
+    self._file = tempfile.NamedTemporaryFile()
+    trace_enable(open(self._file.name, 'a+'))
 
     try:
       cb()
     finally:
       trace_disable()
-    e = TraceEvents(trace_filename = file.name)
-    file.close()
+    e = TraceEvents(trace_filename = self._file.name)
+    self._file.close()
+    self._file = None
     return e
+
+  @property
+  def trace_filename(self):
+    return self._file.name
+
+  def tearDown(self):
+    if trace_is_enabled():
+      trace_disable()
+    if self._file:
+      self._file.close()
