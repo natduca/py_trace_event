@@ -12,7 +12,7 @@ from .trace_test import *
 
 import os
 
-class MultipleProcessTest(TraceTest):
+class LogMultipleProcessIOTest(TraceTest):
   def setUp(self):
     self.proc = None
 

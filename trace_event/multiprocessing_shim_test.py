@@ -32,7 +32,7 @@ def AssertTracingDisabled():
 def TryToDisableTracing():
   trace_disable();
 
-class MultiprocessingTest(TraceTest):
+class MultiprocessingShimTest(TraceTest):
   def test_shimmed(self):
     p = multiprocessing.Process()
     self.assertTrue(hasattr(p, "_shimmed_by_trace_event"))

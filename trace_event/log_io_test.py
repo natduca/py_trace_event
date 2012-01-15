@@ -10,7 +10,7 @@ import unittest
 from .log import *
 from .parsed_trace_events import *
 
-class TraceTest(unittest.TestCase):
+class LogIOTest(unittest.TestCase):
   def test_enable_with_file(self):
     file = tempfile.NamedTemporaryFile()
     trace_enable(open(file.name, 'w+'))
