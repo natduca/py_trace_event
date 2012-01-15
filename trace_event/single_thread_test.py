@@ -6,18 +6,19 @@ import math
 import tempfile
 import time
 import unittest
-from . import *
+from .log import *
 from .trace_test import *
 
 class SingleThreadTest(TraceTest):
   def test_one_func(self):
     actual_diff = []
-    @trace
     def func1():
+      trace_begin("func1")
       start = time.time()
       time.sleep(0.25)
       end = time.time()
       actual_diff.append(end-start) # Pass via array because of Python scoping
+      trace_end("func1")
 
     res = self.go(func1)
     tids = res.findThreadIds()
@@ -31,11 +32,12 @@ class SingleThreadTest(TraceTest):
     self.assertTrue(math.fabs(actual_diff - measured_diff) < 1000)
 
   def test_redundant_flush(self):
-    @trace
     def func1():
+      trace_begin("func1")
       time.sleep(0.25)
       trace_flush()
       trace_flush()
+      trace_end("func1")
 
     res = self.go(func1)
     events = res.findEventsOnThread(res.findThreadIds()[0])
@@ -44,14 +46,16 @@ class SingleThreadTest(TraceTest):
     self.assertEquals('E', events[1]["ph"])
 
   def test_nested_func(self):
-    @trace
     def func1():
+      trace_begin("func1")
       time.sleep(0.25)
       func2()
+      trace_end("func1")
 
-    @trace
     def func2():
+      trace_begin("func2")
       time.sleep(0.05)
+      trace_end("func2")
 
     res = self.go(func1)
     self.assertEquals(1, len(res.findThreadIds()))

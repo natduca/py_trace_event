@@ -7,9 +7,8 @@ import time
 import subprocess
 import sys
 import unittest
-from . import *
+from .log import *
 from .trace_test import *
-
 
 import os
 

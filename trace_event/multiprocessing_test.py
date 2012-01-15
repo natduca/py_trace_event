@@ -5,7 +5,7 @@ import multiprocessing
 import tempfile
 import time
 import unittest
-from . import *
+from .log import *
 from .trace_test import *
 
 import os
@@ -17,9 +17,10 @@ def DoWork():
 
   So, we wrap the function of interest.
   """
-  @trace
   def do_work():
+    trace_begin("do_work")
     time.sleep(0.25)
+    trace_end("do_work")
   do_work()
 
 def AssertTracingEnabled():
@@ -37,33 +38,36 @@ class MultiprocessingTest(TraceTest):
     self.assertTrue(hasattr(p, "_shimmed_by_trace_event"))
 
   def test_trace_enable_throws_in_child(self):
-    @trace
     def work():
+      trace_begin("work")
       p = multiprocessing.Pool(1)
       self.assertRaises(Exception, lambda: p.apply(TryToDisableTracing, ()))
       p.close()
       p.terminate()
       p.join()
+      trace_end("work")
     res = self.go(work)
 
   def test_trace_enabled_in_child(self):
-    @trace
     def work():
+      trace_begin("work")
       p = multiprocessing.Pool(1)
       p.apply(AssertTracingEnabled, ())
       p.close()
       p.terminate()
       p.join()
+      trace_end("work")
     res = self.go(work)
 
   def test_one_func(self):
-    @trace
     def work():
+      trace_begin("work")
       p = multiprocessing.Pool(1)
       p.apply(DoWork, ())
       p.close()
       p.terminate()
       p.join()
+      trace_end("work")
     res = self.go(work)
     work_events = res.findByName('work')
     do_work_events = res.findByName('do_work')
