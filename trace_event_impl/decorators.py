@@ -8,14 +8,7 @@ import time
 import threading
 import functools
 
-__all__ = ["trace", "tracedmethod"]
-
-def trace(func):
-  """
-  Traces the provided function or method, using func.__name__ for the function name.
-
-  To include up the class name in the trace, use the @tracedmethod decorator.
-  """
+def traced(func):
   if inspect.isgeneratorfunction(func):
     raise Exception("Can not trace generators.")
 
@@ -34,9 +27,6 @@ def trace(func):
   return traced_function
 
 def tracedmethod(classmethod):
-  """
-  Traces the provided classmethod. Use @tracefunction on functions.
-  """
   if inspect.isgeneratorfunction(classmethod):
     raise Exception("Can not trace generators.")
     trace_generator(f, category)

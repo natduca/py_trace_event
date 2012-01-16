@@ -9,8 +9,6 @@ import sys
 import time
 import threading
 
-__all__ = ["trace_enable", "trace_is_enabled", "trace_disable", "trace_flush", "trace_begin", "trace_end"]
-
 _lock = threading.Lock()
 
 _enabled = False
@@ -22,6 +20,9 @@ _tls = threading.local() # tls used to detect forking/etc
 _atexit_regsitered_for_pid = None
 
 _control_allowed = True
+
+class TraceException(Exception):
+  pass
 
 def _note(msg, *args):
   pass
@@ -43,22 +44,15 @@ def _disallow_tracing_control():
   _control_allowed = False
 
 def trace_enable(log_file=None):
-  """
-  Enables tracing.
-
-  log_file: None, a string specifying what filename to log to, or any object
-  with a fileno() method. If None, begins recording to "%.json" %
-  sys.argv[0]. Can also be a string, or a file-like object.
-  """
   _trace_enable(log_file)
   
 @_locked
 def _trace_enable(log_file=None):
   global _enabled
   if _enabled:
-    raise Exception("Already enabled")
+    raise TraceException("Already enabled")
   if not _control_allowed:
-    raise Exception("Tracing control not allowed in child processes.")
+    raise TraceException("Tracing control not allowed in child processes.")
   _enabled = True
   global _log_file
   if log_file == None:
@@ -72,7 +66,7 @@ def _trace_enable(log_file=None):
     _note("trace_event: tracelog name is %s" % log_file)
     log_file = open("%s" % log_file, "ab", False)
   elif not hasattr(log_file, 'fileno'):
-    raise Exception("Log file must be None, a string, or a file-like object with a fileno()")
+    raise TraceException("Log file must be None, a string, or a file-like object with a fileno()")
 
   _log_file = log_file
   fcntl.lockf(_log_file.fileno(), fcntl.LOCK_EX)
@@ -99,22 +93,14 @@ def _trace_enable(log_file=None):
 
 @_locked
 def trace_flush():
-  """
-  Flushes any currently-recorded trace data to disk. trace_event records traces
-  into an in-memory buffer first, flushing only when told to do so.
-  """
   if _enabled:
     _flush()
 
 @_locked
 def trace_disable():
-  """
-  Disables tracing, if enabled. Will not disable tracing
-  on any existing child proceses.
-  """
   global _enabled
   if not _control_allowed:
-    raise Exception("Tracing control not allowed in child processes.")
+    raise TraceException("Tracing control not allowed in child processes.")
   if not _enabled:
     return
   _enabled = False
@@ -147,9 +133,6 @@ def _flush(close=False):
 
 @_locked
 def trace_is_enabled():
-  """
-  Returns whether tracing is enabled.
-  """
   return _enabled
 
 @_locked

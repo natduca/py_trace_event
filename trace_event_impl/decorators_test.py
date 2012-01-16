@@ -19,7 +19,7 @@ class DecoratorTests(unittest.TestCase):
     self.assertRaises(Exception, lambda: decorators.trace(generator))
 
 class ClassToTest(object):
-  @decorators.trace
+  @decorators.traced
   def method1(self):
     return 1
 
@@ -27,7 +27,7 @@ class ClassToTest(object):
   def method2(self):
     return 1
 
-@decorators.trace
+@decorators.traced
 def traced_func():
   return 1
 

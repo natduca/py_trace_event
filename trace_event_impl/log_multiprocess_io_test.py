@@ -24,7 +24,7 @@ class LogMultipleProcessIOTest(TraceTest):
   def test_one_subprocess(self):
     def test():
       trace_begin("parent")
-      proc = subprocess.Popen([sys.executable, "-m", "trace_event.multiple_process_test", self.trace_filename, "_test_one_subprocess_child"])
+      proc = subprocess.Popen([sys.executable, "-m", __name__, self.trace_filename, "_test_one_subprocess_child"])
       proc.wait()
       trace_end("parent")
     res = self.go(test)
@@ -42,6 +42,6 @@ if __name__ == "__main__":
   if len(sys.argv) != 3:
     raise Exception("Expected: method name")
   trace_enable(sys.argv[1])
-  t = MultipleProcessTest(sys.argv[2])
+  t = LogMultipleProcessIOTest(sys.argv[2])
   t.run()
   trace_disable()

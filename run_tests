@@ -118,9 +118,9 @@ def main():
   os.chdir(os.path.dirname(__file__))
 
   if len(args) > 0:
-    suites = discover('trace_event', args)
+    suites = discover('trace_event_impl', args)
   else:
-    suites = discover('trace_event', ['.*'])
+    suites = discover('trace_event_impl', ['.*'])
 
   r = unittest.TextTestRunner()
   if not options.incremental:
