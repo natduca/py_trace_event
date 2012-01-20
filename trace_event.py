@@ -73,10 +73,10 @@ if trace_event_impl:
     trace_event_impl.trace_flush()
 
   def trace_begin(name):
-    trace_end = trace_event_impl.add_trace_event("B", time.time(), "python", name)
+    trace_event_impl.add_trace_event("B", time.time(), "python", name)
 
   def trace_end(name):
-    trace_end = trace_event_impl.add_trace_event("B", time.time(), "python", name)
+    trace_event_impl.add_trace_event("E", time.time(), "python", name)
 
   def traced(fn):
     return trace_event_impl.traced(fn)
