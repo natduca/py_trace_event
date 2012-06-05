@@ -78,6 +78,10 @@ class ProcessShim():
   def ident(self):
     return self._proc.ident
 
+  @property
+  def pid(self):
+    return self._proc.pid
+
   def __repr__(self):
     return self._proc.__repr__()
 
