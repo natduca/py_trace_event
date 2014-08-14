@@ -20,10 +20,11 @@ def traced(func):
       return func(*args,**kwargs)
     start = time.time()
     log.add_trace_event("B", start, category, func.__name__)
-    r = func(*args,**kwargs)
-    end = time.time()
-    log.add_trace_event("E", end, category, func.__name__)
-    return r
+    try:
+      return func(*args,**kwargs)
+    finally:
+      end = time.time()
+      log.add_trace_event("E", end, category, func.__name__)
   return traced_function
 
 def tracedmethod(classmethod):
@@ -42,9 +43,10 @@ def tracedmethod(classmethod):
       fname[0] = "%s.%s" % (args[0].__class__.__name__, classmethod.__name__)
     start = time.time()
     log.add_trace_event("B", start, category, fname[0])
-    r = classmethod(*args,**kwargs)
-    end = time.time()
-    log.add_trace_event("E", end, category, fname[0])
-    return r
+    try:
+      return classmethod(*args,**kwargs)
+    finally:
+      end = time.time()
+      log.add_trace_event("E", end, category, fname[0])
   return traced_method
 
