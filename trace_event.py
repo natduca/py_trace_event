@@ -20,7 +20,7 @@ To use trace event, simply call trace_event_enable and start instrumenting your 
      ...
 
    class MyFoo(object):
-     @tracedmethod
+     @traced
      def bar(self):
        ...
 
@@ -72,41 +72,44 @@ if trace_event_impl:
   def trace_flush():
     trace_event_impl.trace_flush()
 
-  def trace_begin(name):
-    trace_event_impl.add_trace_event("B", time.time(), "python", name)
+  def trace_begin(name, **kwargs):
+    trace_event_impl.add_trace_event("B", time.time(), "python", name, kwargs)
 
-  def trace_end(name):
-    trace_event_impl.add_trace_event("E", time.time(), "python", name)
+  def trace_end(name, **kwargs):
+    trace_event_impl.add_trace_event("E", time.time(), "python", name, kwargs)
+
+  def trace(name, **kwargs):
+    return trace_event_impl.trace(name, **kwargs)
 
   def traced(fn):
     return trace_event_impl.traced(fn)
 
-  def tracedmethod(fn):
-    return trace_event_impl.tracedmethod(fn)
-
 else:
+  import contextlib
+
   def trace_enable():
     raise TraceException("Cannot enable trace_event. No trace_event_impl module found.")
 
   def trace_disable():
-    raise TraceException("Cannot disable trace_event. No trace_event_impl module found.")
+    pass
 
   def trace_is_enabled():
     return False
 
   def trace_flush():
-    return
+    pass
 
-  def trace_begin(self, name):
-    return
+  def trace_begin(self, name, **kwargs):
+    pass
 
-  def trace_end(self, name):
-    return
+  def trace_end(self, name, **kwargs):
+    pass
+
+  @contextlib.contextmanager
+  def trace(name, **kwargs):
+    yield
 
   def traced(fn):
-    return fn
-
-  def tracedmethod(fn):
     return fn
 
 
@@ -157,7 +160,7 @@ trace_begin.__doc__ = """Records the beginning of an event of the given name.
         try:
           lines = open().readlines()
         finally:
-          trace_end("read)
+          trace_end("read")
 
         trace_begin("parse")
         try:
@@ -167,11 +170,11 @@ trace_begin.__doc__ = """Records the beginning of an event of the given name.
 
         trace_end("something_heavy")
 
-  Note that a trace_end method must be issued for every trace_begin method. When
-  tracing around methods that might throw exceptions, you should use a try-finally
-  pattern to ensure that the trace_end method is called.
+  Note that a trace_end call must be issued for every trace_begin call. When
+  tracing around blocks that might throw exceptions, you should use the trace function,
+  or a try-finally pattern to ensure that the trace_end method is called.
 
-  See the documentation for the @traced and @tracedmethod decorator for a simpler way to instrument
+  See the documentation for the @traced decorator for a simpler way to instrument
   functions and methods.
   """
 
@@ -184,50 +187,28 @@ trace_end.__doc__ = """Records the end of an event of the given name.
   trace_event_viewer UI.
   """
 
+trace.__doc__ = """Traces a block of code using a with statement.
+
+  Example usage:
+    from trace_event import *
+    def something_heavy(lines):
+      with trace("parse_lines", lines=lines):
+        parse(lines)
+
+  If tracing an entire function call, prefer the @traced decorator.
+  """
+
 traced.__doc__ = """
   Traces the provided function, using the function name for the actual generated event.
 
-  You can use this on class methods, but using @tracedmethod will give you not only the function
-  name but also its controlling class. E.g.;
-    class Foo:
+  Prefer this decorator over the explicit trace_begin and trace_end functions
+  whenever you are tracing the start and stop of a function. It automatically
+  issues trace_begin/end events, even when the wrapped function throws.
 
-      @traced
-      def bar():
-        # generates traces for "bar"
-        pass
-
-      @tracedmethod
-      def bar():
-        # generates traces for "Foo.bar"
-        pass
-
-  Prefer this method over the explicit trace_begin and trace_end methods whenever you are tracing
-  the start and stop of a function. It automatically issues trace_begin/end events, even when the wrapped
-  function throws.
-  """
-
-tracedmethod.__doc__ = """
-  Traces the provided classmethod, using the class name and function name for the actual generated event.
-
-  This will only work on class methods, as it relies on the presence of the self argument to determine
-  the owning class for the method. To trace a function, use the @traced decorator.
-
-    class Foo:
-      @traced
-      def bar():
-        # generates traces for "bar"
-        pass
-
-      @tracedmethod
-      def bar():
-        # generates traces for "Foo.bar"
-        pass
-
-    @tracedmethod # <--- THIS WILL FAIL!!! Use @traced instead.
-    def func():
-       pass
-
-  Prefer this method over the explicit trace_begin and trace_end methods whenever you are tracing
-  the start and stop of a function. It automatically issues trace_begin/end events, even when the wrapped
-  function throws.
+  You can also pass the function's argument names to traced, and the argument
+  values will be added to the trace. Example usage:
+    from trace_event import *
+    @traced("url")
+    def send_request(url):
+      urllib2.urlopen(url).read()
   """

@@ -14,7 +14,7 @@ import unittest
 
 def discover(dir, filters):
   if hasattr(unittest.TestLoader, 'discover'):
-    return unittest.TestLoader().discover(dir)
+    return unittest.TestLoader().discover(dir, '*')
 
   # poor mans unittest.discover
   loader = unittest.TestLoader()

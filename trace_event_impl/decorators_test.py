@@ -23,7 +23,7 @@ class ClassToTest(object):
   def method1(self):
     return 1
 
-  @decorators.tracedmethod
+  @decorators.traced
   def method2(self):
     return 1
 

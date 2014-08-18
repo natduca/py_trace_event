@@ -136,7 +136,7 @@ def trace_is_enabled():
   return _enabled
 
 @_locked
-def add_trace_event(ph, ts, category, name, args=[]):
+def add_trace_event(ph, ts, category, name, args=None):
   global _enabled
   if not _enabled:
     return
@@ -158,13 +158,13 @@ def add_trace_event(ph, ts, category, name, args=[]):
   _cur_events.append({"ph": ph, "category": category,
                       "pid": _tls.pid, "tid": _tls.tid,
                       "ts": ts,
-                      "name": name, "args": args});
+                      "name": name, "args": args or {}});
 
-def trace_begin(name):
-  add_trace_event("B", time.time(), "python", name)
+def trace_begin(name, args=None):
+  add_trace_event("B", time.time(), "python", name, args)
 
-def trace_end(name):
-  add_trace_event("E", time.time(), "python", name)
+def trace_end(name, args=None):
+  add_trace_event("E", time.time(), "python", name, args)
 
 def _trace_disable_atexit():
   trace_disable()
