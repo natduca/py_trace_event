@@ -73,10 +73,11 @@ if trace_event_impl:
     trace_event_impl.trace_flush()
 
   def trace_begin(name, **kwargs):
-    trace_event_impl.add_trace_event("B", time.time(), "python", name, kwargs)
+    args_to_log = {key: repr(value) for key, value in kwargs.iteritems()}
+    trace_event_impl.add_trace_event("B", time.time(), "python", name, args_to_log)
 
-  def trace_end(name, **kwargs):
-    trace_event_impl.add_trace_event("E", time.time(), "python", name, kwargs)
+  def trace_end(name):
+    trace_event_impl.add_trace_event("E", time.time(), "python", name)
 
   def trace(name, **kwargs):
     return trace_event_impl.trace(name, **kwargs)
@@ -102,7 +103,7 @@ else:
   def trace_begin(self, name, **kwargs):
     pass
 
-  def trace_end(self, name, **kwargs):
+  def trace_end(self, name):
     pass
 
   @contextlib.contextmanager

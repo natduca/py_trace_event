@@ -10,13 +10,15 @@ import log
 
 @contextlib.contextmanager
 def trace(name, **kwargs):
+  category = "python"
   start = time.time()
-  log.add_trace_event("B", start, category, name, kwargs)
+  args_to_log = {key: repr(value) for key, value in kwargs.iteritems()}
+  log.add_trace_event("B", start, category, name, args_to_log)
   try:
     yield
   finally:
     end = time.time()
-    log.add_trace_event("E", end, category, name, kwargs)
+    log.add_trace_event("E", end, category, name)
 
 def traced(*args):
   def get_wrapper(func):
@@ -30,7 +32,8 @@ def traced(*args):
 
     def arg_spec_tuple(name):
       arg_index = arg_spec.args.index(name)
-      default_index = arg_index + len(arg_spec.defaults) - len(arg_spec.args)
+      defaults_length = len(arg_spec.defaults) if arg_spec.defaults else 0
+      default_index = arg_index + defaults_length - len(arg_spec.args)
       if default_index >= 0:
         default = arg_spec.defaults[default_index]
       else:
@@ -49,7 +52,7 @@ def traced(*args):
       def get_arg_value(name, index, default):
         if name in kwargs:
           return kwargs[name]
-        elif index and index < len(args):
+        elif index < len(args):
           return args[index]
         else:
           return default
@@ -70,7 +73,7 @@ def traced(*args):
         return func(*args, **kwargs)
       finally:
         end = time.time()
-        log.add_trace_event("E", end, category, name, arg_values)
+        log.add_trace_event("E", end, category, name)
     return traced_function
 
   no_decorator_arguments = len(args) == 1 and callable(args[0])
