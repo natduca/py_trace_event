@@ -147,7 +147,7 @@ trace_flush.__doc__ = """Flushes any currently-recorded trace data to disk.
   is only done at process exit or when this method is called.
   """
 
-trace_flush.__doc__ = """Returns whether tracing is enabled.
+trace_is_enabled.__doc__ = """Returns whether tracing is enabled.
   """
 
 trace_begin.__doc__ = """Records the beginning of an event of the given name.
