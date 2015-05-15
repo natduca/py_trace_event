@@ -5,7 +5,7 @@
 from distutils.core import setup
 setup(
     name = 'py_trace_event',
-    packages = ['trace_event'],
+    packages = ['trace_event_impl'],
     version = '0.1.0',
     description = 'Performance tracing for python',
     author='Nat Duca'
